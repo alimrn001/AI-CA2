@@ -1,17 +1,19 @@
 import random 
 import copy
+import time
 
 CrossoverProbability = 0.7
 MutationProbability = 0.05
 CarryProbability = 1 - CrossoverProbability
-PopulationSize = 10
+PopulationSize = 1000
 
 GoalMinReturn = 1000
 GoalMaxRisk = 60
 GoalMinStocks = 30
 
 
-class Stock :
+class Stock : #each element of a gene
+
     def __init__(self, ticker, riskVal, returnVal) :
         self.ticker = ticker
         self.riskVal = riskVal
@@ -20,6 +22,56 @@ class Stock :
 
     def setCoefficient(self, coefficient):
         self.coefficient = coefficient
+
+
+class Investment : # acts as a chromosome
+
+    def __init__(self, stocks) :
+        self.stocks = stocks
+        self.setAvgReturn()
+        self.setAvgRisk()
+        self.setStocksNumber()
+        #self.setFitness()
+
+    def setFitness(self) :
+        returnGoal, riskGoal, stockGoal = 0,0,0
+
+        if(self.stocksNum > GoalMinStocks) :
+            stockGoal = 0
+        else :
+            stockGoal = abs(self.stocksNum - GoalMinStocks)
+
+        if(self.returnVal > GoalMinReturn) :
+            returnGoal = 0
+        else :
+            returnGoal = abs(self.returnVal - GoalMinReturn)
+
+        if(self.riskVal < GoalMaxRisk) :
+            riskGoal = 0
+        else :
+            riskGoal = abs(self.riskVal - GoalMaxRisk)
+           
+        fitness = 1 / (stockGoal + returnGoal + riskGoal + 1)
+        self.fitness = fitness
+    
+    def setStocksNumber(self) :
+        stocksNo = 0
+        for stock in self.stocks : 
+            if(stock.coefficient != 0) :
+                stocksNo += 1
+        self.stocksNum = stocksNo
+
+    def setAvgReturn(self) :
+        returnVal = 0
+        for stock in self.stocks :
+            returnVal += stock.coefficient * stock.returnVal
+        self.returnVal = returnVal
+
+    def setAvgRisk(self) :
+        riskVal = 0
+        for stock in self.stocks :
+            riskVal += stock.coefficient * stock.riskVal
+        self.riskVal = riskVal
 
 
 stockData = []
@@ -37,7 +89,6 @@ stockData.append(Tsla)
 stockData.append(Msft)
 stockData.append(Nvda)
 
-
 def getInitialPopulation() :
     population = []
 
@@ -50,7 +101,9 @@ def getInitialPopulation() :
             stockData[k].setCoefficient(r[k])
 
         stockDataCp = copy.deepcopy(stockData)
-        population.append(stockDataCp)
+        investment = Investment(stockDataCp)
+    
+        population.append(investment)
         
     return population
 
@@ -73,34 +126,16 @@ def getNumOfStocksInInvestment(investment) :
             numOfStocks += 1
     return numOfStocks
 
-def getFitness(investment) :
-    returnGoal, riskGoal, stockGoal = 0,0,0
-    investmentStocks = getNumOfStocksInInvestment(investment)
-    investmentReturn = getReturnInInvestment(investment)
-    investmentRisk = getRiskInInvestment(investment)
+def calculateFitness() :
+    for chromosome in population :
+        chromosome.setFitness() 
 
-    if(investmentStocks > GoalMinStocks) :
-        stockGoal = 0
-    else :
-        stockGoal = abs(investmentStocks - GoalMinStocks)
-
-    if(investmentReturn > GoalMinReturn) :
-        returnGoal = 0
-    else :
-        returnGoal = abs(investmentReturn - GoalMinReturn)
-
-    if(investmentRisk < GoalMaxRisk) :
-        riskGoal = 0
-    else :
-        riskGoal = abs(investmentRisk - GoalMaxRisk)
-           
-    fitness = 1 / (stockGoal + returnGoal + riskGoal + 1)
-    
-    return fitness
-
-
+stime = time.time()
 
 population = getInitialPopulation()
+calculateFitness()
 
-for investment in population :
-    print(getFitness(investment))
+print("--- %s seconds ---" % (time.time() - stime))
+
+# for investment in population :
+#     print(investment.fitness)
