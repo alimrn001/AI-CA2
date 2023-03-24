@@ -6,6 +6,9 @@ MutationProbability = 0.05
 CarryProbability = 1 - CrossoverProbability
 PopulationSize = 10
 
+GoalMinReturn = 1000
+GoalMaxRisk = 60
+GoalMinStocks = 30
 
 
 class Stock :
@@ -51,4 +54,53 @@ def getInitialPopulation() :
         
     return population
 
+def getReturnInInvestment(investment) :
+    returnVal = 0
+    for stock in investment :
+        returnVal += stock.coefficient * stock.returnVal
+    return returnVal
+
+def getRiskInInvestment(investment) :
+    riskVal = 0
+    for stock in investment :
+        riskVal += stock.coefficient * stock.riskVal
+    return riskVal
+
+def getNumOfStocksInInvestment(investment) :
+    numOfStocks = 0
+    for stock in investment :
+        if(stock.coefficient != 0) :
+            numOfStocks += 1
+    return numOfStocks
+
+def getFitness(investment) :
+    returnGoal, riskGoal, stockGoal = 0,0,0
+    investmentStocks = getNumOfStocksInInvestment(investment)
+    investmentReturn = getReturnInInvestment(investment)
+    investmentRisk = getRiskInInvestment(investment)
+
+    if(investmentStocks > GoalMinStocks) :
+        stockGoal = 0
+    else :
+        stockGoal = abs(investmentStocks - GoalMinStocks)
+
+    if(investmentReturn > GoalMinReturn) :
+        returnGoal = 0
+    else :
+        returnGoal = abs(investmentReturn - GoalMinReturn)
+
+    if(investmentRisk < GoalMaxRisk) :
+        riskGoal = 0
+    else :
+        riskGoal = abs(investmentRisk - GoalMaxRisk)
+           
+    fitness = 1 / (stockGoal + returnGoal + riskGoal + 1)
+    
+    return fitness
+
+
+
 population = getInitialPopulation()
+
+for investment in population :
+    print(getFitness(investment))
