@@ -5,11 +5,11 @@ import time
 CrossoverProbability = 0.7
 MutationProbability = 0.05
 CarryProbability = 1 - CrossoverProbability
-PopulationSize = 1000
+PopulationSize = 5
 
-GoalMinReturn = 1000
+GoalMinReturn = 500
 GoalMaxRisk = 60
-GoalMinStocks = 30
+GoalMinStocks = 3
 
 
 class Stock : #each element of a gene
@@ -31,7 +31,16 @@ class Investment : # acts as a chromosome
         self.setAvgReturn()
         self.setAvgRisk()
         self.setStocksNumber()
+        self.setStocksCoeffScale()
         #self.setFitness()
+
+    def setStocksCoeffScale(self) :
+        sum = 0
+        for st in self.stocks :
+            sum += st.coefficient
+
+        for st in self.stocks :
+            st.coefficient /= sum
 
     def setFitness(self) :
         returnGoal, riskGoal, stockGoal = 0,0,0
@@ -130,12 +139,82 @@ def calculateFitness() :
     for chromosome in population :
         chromosome.setFitness() 
 
+def applyCrossover(matingPool) : #mating pool is chromosome population
+    crossoverPool, parents = [], []
+    
+    for i in range(len(matingPool)-1) : 
+        if(random.random() > CrossoverProbability) :
+            crossoverPool.append(matingPool[i])
+        else :
+            parents.append(matingPool[i])
+        
+    # print('len is : ', len(parents))
+    # for p in parents :
+    #     for st in p.stocks :
+    #         print(st.coefficient, " , " , end='')
+    #     print('-----------')
+
+
+
+    for chromosome1, chromosome2 in zip(parents, parents[1:]) :
+        i = 2
+        chromosome1Stock = copy.deepcopy(chromosome1.stocks)
+        chromosome2Stock = copy.deepcopy(chromosome2.stocks)
+
+        # for st in chromosome1Stock :
+        #     print(st.coefficient, " , " , end=' ')
+        # print('\n---------\n')
+        # for st in chromosome2Stock :
+        #     print(st.coefficient, " , " , end=' ')
+        # print('\n---------\n')
+        # print('---------------------------')
+
+        child1 = Investment( chromosome1Stock[:i] + chromosome2Stock[i:] )
+        child2 = Investment( chromosome2Stock[:i] + chromosome1Stock[i:] )
+
+
+        for st in child1.stocks :
+            print(st.coefficient, " , " , end=' ')
+        print('\n---------\n')
+        for st in child2.stocks :
+            print(st.coefficient, " , " , end=' ')
+        print('\n---------\n')
+        print('---------------------------')
+
+        # child1.setStocksCoeffScale()
+        # child2.setStocksCoeffScale()
+        crossoverPool.append(child1)
+        crossoverPool.append(child2)
+
+    return crossoverPool
+
+
 stime = time.time()
 
 population = getInitialPopulation()
-calculateFitness()
+#calculateFitness()
+crossOver = applyCrossover(population)
+
+print('kir')
+
 
 print("--- %s seconds ---" % (time.time() - stime))
 
-# for investment in population :
-#     print(investment.fitness)
+print('init population')
+for investment in population :
+    for st in investment.stocks :
+        print(" ", st.coefficient, end=' ')  
+    print('\n----------------------------------------------')
+
+print('\n\n---------------------- cross over -------------------------\n\n')
+
+# print(len(list(set(crossOver))))
+
+for investment in crossOver :
+    for st in investment.stocks :
+        print("coeff : ", st.coefficient, end=' ')
+        # print("coeff : ", st.coefficient , "")
+        # print("ticker : ", st.ticker)
+        # print("return : ", st.returnVal)
+        # print("risk : ", st.riskVal)
+    print('--------')
