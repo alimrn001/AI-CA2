@@ -31,7 +31,7 @@ class Investment : # acts as a chromosome
         self.setAvgReturn()
         self.setAvgRisk()
         self.setStocksNumber()
-        self.setStocksCoeffScale()
+        #self.setStocksCoeffScale()
         #self.setFitness()
 
     def setStocksCoeffScale(self) :
@@ -148,12 +148,12 @@ def applyCrossover(matingPool) : #mating pool is chromosome population
         else :
             parents.append(matingPool[i])
         
-    # print('len is : ', len(parents))
-    # for p in parents :
-    #     for st in p.stocks :
-    #         print(st.coefficient, " , " , end='')
-    #     print('-----------')
-
+    #print('len is : ', len(parents))
+    for p in parents :
+        for st in p.stocks :
+            print(st.coefficient, " , " , end='')
+        print('-----------')
+    print('\n--------------------\n')
 
 
     for chromosome1, chromosome2 in zip(parents, parents[1:]) :
@@ -161,18 +161,29 @@ def applyCrossover(matingPool) : #mating pool is chromosome population
         chromosome1Stock = copy.deepcopy(chromosome1.stocks)
         chromosome2Stock = copy.deepcopy(chromosome2.stocks)
 
-        # for st in chromosome1Stock :
-        #     print(st.coefficient, " , " , end=' ')
-        # print('\n---------\n')
-        # for st in chromosome2Stock :
-        #     print(st.coefficient, " , " , end=' ')
-        # print('\n---------\n')
-        # print('---------------------------')
+        print('chromosomes selection : ')
+        for st in chromosome1Stock :
+            print(st.coefficient, " , " , end=' ')
+        print('\n---------')
+        for st in chromosome2Stock :
+            print(st.coefficient, " , " , end=' ')
+        print('---------------------------')
+
+        print('coeff concatenated 1 : ')
+        for st in chromosome1Stock[:i] :
+            print(st.coefficient, " , " , end=' ')
+        for st in chromosome2Stock[i:] :
+            print(st.coefficient, " , " , end=' ')
+
+        print('\nconcat result : ')
+        for st in chromosome1Stock[:i] + chromosome2Stock[i:] :
+            print(st.coefficient, " , " , end=' ')
+
 
         child1 = Investment( chromosome1Stock[:i] + chromosome2Stock[i:] )
         child2 = Investment( chromosome2Stock[:i] + chromosome1Stock[i:] )
 
-
+        print('\nchildren : ')
         for st in child1.stocks :
             print(st.coefficient, " , " , end=' ')
         print('\n---------\n')
