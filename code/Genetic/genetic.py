@@ -3,10 +3,10 @@ import copy
 import time
 
 CrossoverProbability = 0.7
-MutationProbability = 0.1
+MutationProbability = 0.3
 CarryProbability = 0.3
-PopulationSize = 20
-
+PopulationSize = 200
+MaxRandomVal = 200
 GoalMinReturn = 2.5
 GoalMaxRisk = 0.4
 GoalMinStocks = 3
@@ -32,8 +32,6 @@ class Investment : # acts as a chromosome
         self.setAvgReturn()
         self.setAvgRisk()
         self.setStocksNumber()
-        #self.setStocksCoeffScale()
-        #self.setFitness()
 
     def setStocksCoeffScale(self) :
         sum = 0
@@ -42,6 +40,7 @@ class Investment : # acts as a chromosome
 
         for st in self.stocks :
             st.coefficient /= sum
+            st.coefficient *= 100
 
     def setFitness(self) :
         returnGoal, riskGoal, stockGoal = 0,0,0
@@ -74,13 +73,13 @@ class Investment : # acts as a chromosome
     def setAvgReturn(self) :
         returnVal = 0
         for stock in self.stocks :
-            returnVal += stock.coefficient * stock.returnVal
+            returnVal += stock.coefficient/100 * stock.returnVal
         self.returnVal = returnVal
 
     def setAvgRisk(self) :
         riskVal = 0
         for stock in self.stocks :
-            riskVal += stock.coefficient * stock.riskVal
+            riskVal += stock.coefficient/100 * stock.riskVal
         self.riskVal = riskVal
 
 
@@ -104,18 +103,15 @@ def getInitialPopulation() :
     
     for i in range(PopulationSize) :
         r=[]
-        # r = [random.random() for j in range(0,len(stockData))]
-        # s = sum(r)
-        # r = [ i/s for i in r ]
         for j in range(0,len(stockData)) :
-            r.append(random.random())
+            r.append(random.randint(0, MaxRandomVal))
 
         for k in range(0, len(r)) : 
             stockData[k].setCoefficient(r[k])
 
         stockDataCp = copy.deepcopy(stockData)
         investment = Investment(stockDataCp)
-    
+
         population.append(investment)
         
     return population
@@ -173,20 +169,14 @@ def applyMutation(chromosome) :
     for i, gene in enumerate(mutated.stocks) :
         r = random.random()
         if(r < MutationProbability) :
-            mutated.stocks[i].coefficient += random.random() # 0 to 1
+            mutated.stocks[i].coefficient = random.randint(0, MaxRandomVal) # 0 to 1
             changed = True
-            #print('in i = ', i, 'mutation result = ', mutated.stocks[i].coefficient)
 
     if(changed) :
         x = Investment(copy.deepcopy(mutated.stocks))
         x.setFitness()
         return x
-        # mutated.setStocksCoeffScale()
-        # mutated.setAvgReturn()
-        # mutated.setAvgRisk()
-        # mutated.setStocksNumber()
-        # mutated.setFitness()
-    
+
     return chromosome
 
 def applyGenetic(population) : 
@@ -196,27 +186,14 @@ def applyGenetic(population) :
     while(True) :
         cnt += 1
 
-        if(cnt==300 or cnt == 2 or cnt == 20) :
-            print('cnt = ', cnt)
-            for investment in population :
-                for st in investment.stocks :
-                    print(st.coefficient, " ", end=' ')
-                print('fitness : ', investment.fitness)
-                #print('return : ', investment.returnVal)
-                #print('stocks num : ', investment.stocksNum)
-                #print('risk : ', investment.riskVal)
-            print('----------------------')
-
         random.shuffle(population)
         calculateFitness(population)
-
-        #print('population size : ', len(population))
 
         for invest in population :
             if(invest.fitness == 1) :
                 return invest
 
-        if(cnt == 10000) :
+        if(cnt == 1000) :
             break
 
         carriedChromosomes, selectedChromosomes = [], copy.deepcopy(population)
@@ -230,12 +207,8 @@ def applyGenetic(population) :
 
         for i in range(int(PopulationSize*(1-CarryProbability))) :
             population.append(applyMutation(crossoverPool[i]))
-            #population.append(crossoverPool[i])
             
-
         population.extend(carriedChromosomes)
-
-
 
 
 stime = time.time()
@@ -246,32 +219,5 @@ result = applyGenetic(population)
 for st in result.stocks :
     print(st.coefficient, " ", end=' ')
 print('fitness : ', result.fitness)
-print('return : ', result.returnVal)
-print('stocks num : ', result.stocksNum)
-print('risk : ', result.riskVal)
-
-
-
-# calculateFitness(population)
-# crossOver = applyCrossover(population)
 
 print("--- %s seconds ---" % (time.time() - stime))
-
-# print('init population')
-# for investment in population :
-#     for st in investment.stocks :
-#         print(" ", st.coefficient, end=' ')  
-#     print('\n----------------------------------------------')
-
-# print('\n\n---------------------- cross over -------------------------\n\n')
-
-# # print(len(list(set(crossOver))))
-
-# for investment in crossOver :
-#     for st in investment.stocks :
-#         print(st.coefficient, " ", end=' ')
-#     print('fitness : ', investment.fitness)
-#     print('return : ', investment.returnVal)
-#     print('stocks num : ', investment.stocksNum)
-#     print('risk : ', investment.riskVal)
-
