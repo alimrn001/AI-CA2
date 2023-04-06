@@ -3,6 +3,7 @@ import time
 import turtle
 import numpy as np
 import sys
+import copy
 
 class OthelloUI:
     def __init__(self, board_size=6, square_size=60):
@@ -117,19 +118,20 @@ class Othello:
         heuristic = 0
 
         for i in range(0, 5) :
-                for j in range (0, 5) :
-                    if(self.board[i][j] == -1) :
-                        ai_tiles += 1
-                    elif(self.board[i][j] == 1):
-                        human_tiles += 1
+            for j in range (0, 5) :
+                if(self.board[i][j] == -1) :
+                    ai_tiles += 1
+                elif(self.board[i][j] == 1):
+                    human_tiles += 1
 
         if(human_tiles + ai_tiles == 36) :
-                if(human_tiles > ai_tiles) :
-                    return sys.maxsize * (self.current_turn)
-                elif(human_tiles < ai_tiles) :
-                    return -sys.maxsize * (self.current_turn)
-                else :
-                    return 0 # match draw case
+            print('reaching here at end !')
+            if(human_tiles > ai_tiles) :
+                return sys.maxsize * (self.current_turn)
+            elif(human_tiles < ai_tiles) :
+                return -sys.maxsize * (self.current_turn)
+            else :
+                return 0 # match draw case
 
         heuristic += (human_tiles - ai_tiles)*self.current_turn
         
@@ -210,15 +212,53 @@ class Othello:
 
         return heuristic
         
+    def minimax(self, depth) :
+        if(depth==0) :
+            return (self.get_heuristic(), None)
+        
+        final_move_human, final_move_cpu = None, None
+
+        if(self.current_turn == 1) :
+            max_res = -sys.maxsize
+            for move in self.get_valid_moves(1) :
+                new_state = copy.deepcopy(self)
+                new_state.make_move(self.current_turn,move)
+                new_state.current_turn = -self.current_turn
+                max_temp = new_state.minimax(depth-1)[0]
+                if(max_temp >= max_res) :
+                    max_res, final_move_human = max_temp, move
+            return max_res, final_move_human
+
+        else :
+            min_res = sys.maxsize
+            for move in self.get_valid_moves(-1) :
+                new_state = copy.deepcopy(self)
+                new_state.make_move(self.current_turn, move)
+                new_state.current_turn = -self.current_turn
+                min_temp = new_state.minimax(depth-1)[0]
+                if(min_temp <= min_res) : 
+                    min_res, final_move_cpu = min_temp, move
+            return min_res, final_move_cpu
+    
     def get_cpu_move(self):
         moves = self.get_valid_moves(-1)
         if len(moves) == 0:
             return None
-        return random.choice(moves)
+        move = random.choice(moves)
+        print('AI move : ', move[0], move[1])
+        return move
+        #return random.choice(moves)
 
     def get_human_move(self):
         # TODO
-        raise NotImplementedError
+        move = self.minimax(self.minimax_depth)
+        print('human move : ', move[0], move[1])
+        return move
+        # if len(moves) == 0:
+        #     return None
+        # return random.choice(moves)
+
+        # raise NotImplementedError
 
     def terminal_test(self):
         return len(self.get_valid_moves(1)) == 0 and len(self.get_valid_moves(-1)) == 0
@@ -231,7 +271,7 @@ class Othello:
             if self.current_turn == 1:
                 move = self.get_human_move()
                 if move:
-                    self.make_move(self.current_turn, move)
+                    self.make_move(self.current_turn, move[1])
             else:
                 move = self.get_cpu_move()
                 if move:
@@ -244,14 +284,16 @@ class Othello:
         return winner
 
 
-othello = Othello(True)
-othello.board = [
-    [-1, 1 , 1 ,  1 ,  1 ,  0],
-    [1 , 1 ,-1 , -1 , -1 ,  1],
-    [1 , 1 , 0 , -1 , -1 ,  1],
-    [1 , 0 ,-1 ,  1 ,  0 ,  1],
-    [1 ,-1 , 0 ,  0 ,  0 ,  1],
-    [1 , 1 , 1 ,  1 ,  1 , -1]
-]
-othello.current_turn=-1
-print (othello.get_heuristic())
+othello = Othello(False, 5)
+# othello.board = [
+#     [-1, 1 , 1 ,  1 ,  1 ,  0],
+#     [1 , 1 ,-1 , -1 , -1 ,  1],
+#     [1 , 1 , 0 , -1 , -1 ,  1],
+#     [1 , 0 ,-1 ,  1 ,  0 ,  1],
+#     [1 ,-1 , 0 ,  0 ,  0 ,  1],
+#     [1 , 1 , 1 ,  1 ,  1 , -1]
+# ]
+# othello.current_turn=-1
+# print (othello.get_heuristic())
+winner = othello.play()
+print('winned by : ',winner)
