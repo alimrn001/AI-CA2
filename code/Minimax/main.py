@@ -1,7 +1,8 @@
 import random
 import time
 import turtle
-
+import numpy as np
+import sys
 
 class OthelloUI:
     def __init__(self, board_size=6, square_size=60):
@@ -109,6 +110,106 @@ class Othello:
                     for (cx, cy) in captured:
                         self.board[cx][cy] = player
 
+    def get_heuristic(self) :
+        ai_tiles, human_tiles = 0, 0
+        ai_corners, human_corners = 0, 0
+        ai_loose_rows_num, human_loose_rows_num = 0, 0
+        heuristic = 0
+
+        for i in range(0, 5) :
+                for j in range (0, 5) :
+                    if(self.board[i][j] == -1) :
+                        ai_tiles += 1
+                    elif(self.board[i][j] == 1):
+                        human_tiles += 1
+
+        if(human_tiles + ai_tiles == 36) :
+                if(human_tiles > ai_tiles) :
+                    return sys.maxsize * (self.current_turn)
+                elif(human_tiles < ai_tiles) :
+                    return -sys.maxsize * (self.current_turn)
+                else :
+                    return 0 # match draw case
+
+        heuristic += (human_tiles - ai_tiles)*self.current_turn
+        
+        for i in range(0, 10, 5) :
+            for j in range(0, 10, 5) :
+                if(self.board[i][j] == 1) :
+                    human_corners += 1
+                elif(self.board[i][j] == -1) :
+                    ai_corners += 1
+
+        heuristic += 5*(human_corners - ai_corners) * self.current_turn
+        
+        if(self.board[0][0] == 0) :
+            if(self.board[1][0] == -1 and self.board[5][0] == 1) :
+                ai_loose_rows_num += 1
+            elif(self.board[1][0] == 1 and self.board[5][0] == -1) :
+                human_loose_rows_num += 1
+            
+            if(self.board[0][1] == -1 and self.board[0][5] == 1):
+                ai_loose_rows_num += 1
+            elif(self.board[0][1] == 1 and self.board[0][5] == -1):
+                human_loose_rows_num += 1
+
+            if(self.board[1][1] == -1 and self.board[5][5] == 1):
+                ai_loose_rows_num += 1
+            if(self.board[1][1] == 1 and self.board[5][5] == -1):
+                human_loose_rows_num += 1
+
+        if(self.board[0][5] == 0) :
+            if(self.board[1][5] == -1 and self.board[5][5] == 1) :
+                ai_loose_rows_num += 1
+            elif(self.board[1][5] == 1 and self.board[5][5] == -1) :
+                human_loose_rows_num += 1
+            
+            if(self.board[0][4] == -1 and self.board[0][0] == 1):
+                ai_loose_rows_num += 1
+            elif(self.board[0][4] == 1 and self.board[0][0] == -1):
+                human_loose_rows_num += 1
+
+            if(self.board[1][4] == -1 and self.board[5][0] == 1):
+                ai_loose_rows_num += 1
+            if(self.board[1][4] == 1 and self.board[5][0] == -1):
+                human_loose_rows_num += 1
+
+        if(self.board[5][0] == 0) :
+            if(self.board[4][0] == -1 and self.board[0][0] == 1) :
+                ai_loose_rows_num += 1
+            elif(self.board[4][0] == 1 and self.board[0][0] == -1) :
+                human_loose_rows_num += 1
+            
+            if(self.board[5][1] == -1 and self.board[5][5] == 1):
+                ai_loose_rows_num += 1
+            elif(self.board[5][1] == 1 and self.board[5][5] == -1):
+                human_loose_rows_num += 1
+
+            if(self.board[4][1] == -1 and self.board[0][5] == 1):
+                ai_loose_rows_num += 1
+            if(self.board[4][1] == 1 and self.board[0][5] == -1):
+                human_loose_rows_num += 1
+            
+        if(self.board[5][5] == 0) :
+            if(self.board[5][4] == -1 and self.board[5][0] == 1) :
+                ai_loose_rows_num += 1
+            elif(self.board[5][4] == 1 and self.board[5][0] == -1) :
+                human_loose_rows_num += 1
+            
+            if(self.board[4][5] == -1 and self.board[0][5] == 1):
+                ai_loose_rows_num += 1
+            elif(self.board[4][5] == 1 and self.board[0][5] == -1):
+                human_loose_rows_num += 1
+
+            if(self.board[4][4] == -1 and self.board[0][0] == 1):
+                ai_loose_rows_num += 1
+            if(self.board[4][4] == 1 and self.board[0][0] == -1):
+                human_loose_rows_num += 1
+
+        heuristic += 10*(ai_loose_rows_num - human_loose_rows_num)*self.current_turn
+
+        return heuristic
+        
     def get_cpu_move(self):
         moves = self.get_valid_moves(-1)
         if len(moves) == 0:
@@ -141,3 +242,16 @@ class Othello:
                 time.sleep(1)
         winner = self.get_winner()
         return winner
+
+
+othello = Othello(True)
+othello.board = [
+    [-1, 1 , 1 ,  1 ,  1 ,  0],
+    [1 , 1 ,-1 , -1 , -1 ,  1],
+    [1 , 1 , 0 , -1 , -1 ,  1],
+    [1 , 0 ,-1 ,  1 ,  0 ,  1],
+    [1 ,-1 , 0 ,  0 ,  0 ,  1],
+    [1 , 1 , 1 ,  1 ,  1 , -1]
+]
+othello.current_turn=1
+print (othello.get_heuristic())
