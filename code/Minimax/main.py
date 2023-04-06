@@ -143,67 +143,67 @@ class Othello:
         heuristic += 5*(human_corners - ai_corners) * self.current_turn
         
         if(self.board[0][0] == 0) :
-            if(self.board[1][0] == -1 and self.board[5][0] == 1) :
+            if(self.board[1][0] == -1 and self.current_turn == 1) :
                 ai_loose_rows_num += 1
-            elif(self.board[1][0] == 1 and self.board[5][0] == -1) :
+            elif(self.board[1][0] == 1 and self.current_turn == -1) :
                 human_loose_rows_num += 1
             
-            if(self.board[0][1] == -1 and self.board[0][5] == 1):
+            if(self.board[0][1] == -1 and self.current_turn == 1):
                 ai_loose_rows_num += 1
-            elif(self.board[0][1] == 1 and self.board[0][5] == -1):
+            elif(self.board[0][1] == 1 and self.current_turn == -1):
                 human_loose_rows_num += 1
 
-            if(self.board[1][1] == -1 and self.board[5][5] == 1):
+            if(self.board[1][1] == -1 and self.current_turn == 1):
                 ai_loose_rows_num += 1
-            if(self.board[1][1] == 1 and self.board[5][5] == -1):
+            if(self.board[1][1] == 1 and self.current_turn == -1):
                 human_loose_rows_num += 1
 
         if(self.board[0][5] == 0) :
-            if(self.board[1][5] == -1 and self.board[5][5] == 1) :
+            if(self.board[1][5] == -1 and self.current_turn == 1) :
                 ai_loose_rows_num += 1
-            elif(self.board[1][5] == 1 and self.board[5][5] == -1) :
+            elif(self.board[1][5] == 1 and self.current_turn == -1) :
                 human_loose_rows_num += 1
             
-            if(self.board[0][4] == -1 and self.board[0][0] == 1):
+            if(self.board[0][4] == -1 and self.current_turn == 1):
                 ai_loose_rows_num += 1
-            elif(self.board[0][4] == 1 and self.board[0][0] == -1):
+            elif(self.board[0][4] == 1 and self.current_turn == -1):
                 human_loose_rows_num += 1
 
-            if(self.board[1][4] == -1 and self.board[5][0] == 1):
+            if(self.board[1][4] == -1 and self.current_turn == 1):
                 ai_loose_rows_num += 1
-            if(self.board[1][4] == 1 and self.board[5][0] == -1):
+            if(self.board[1][4] == 1 and self.current_turn == -1):
                 human_loose_rows_num += 1
 
         if(self.board[5][0] == 0) :
-            if(self.board[4][0] == -1 and self.board[0][0] == 1) :
+            if(self.board[4][0] == -1 and self.current_turn == 1) :
                 ai_loose_rows_num += 1
-            elif(self.board[4][0] == 1 and self.board[0][0] == -1) :
+            elif(self.board[4][0] == 1 and self.current_turn == -1) :
                 human_loose_rows_num += 1
             
-            if(self.board[5][1] == -1 and self.board[5][5] == 1):
+            if(self.board[5][1] == -1 and self.current_turn == 1):
                 ai_loose_rows_num += 1
-            elif(self.board[5][1] == 1 and self.board[5][5] == -1):
+            elif(self.board[5][1] == 1 and self.current_turn == -1):
                 human_loose_rows_num += 1
 
-            if(self.board[4][1] == -1 and self.board[0][5] == 1):
+            if(self.board[4][1] == -1 and self.current_turn == 1):
                 ai_loose_rows_num += 1
-            if(self.board[4][1] == 1 and self.board[0][5] == -1):
+            if(self.board[4][1] == 1 and self.current_turn == -1):
                 human_loose_rows_num += 1
             
         if(self.board[5][5] == 0) :
-            if(self.board[5][4] == -1 and self.board[5][0] == 1) :
+            if(self.board[5][4] == -1 and self.current_turn == 1) :
                 ai_loose_rows_num += 1
-            elif(self.board[5][4] == 1 and self.board[5][0] == -1) :
+            elif(self.board[5][4] == 1 and self.current_turn == -1) :
                 human_loose_rows_num += 1
             
-            if(self.board[4][5] == -1 and self.board[0][5] == 1):
+            if(self.board[4][5] == -1 and self.current_turn == 1):
                 ai_loose_rows_num += 1
-            elif(self.board[4][5] == 1 and self.board[0][5] == -1):
+            elif(self.board[4][5] == 1 and self.current_turn == -1):
                 human_loose_rows_num += 1
 
-            if(self.board[4][4] == -1 and self.board[0][0] == 1):
+            if(self.board[4][4] == -1 and self.current_turn == 1):
                 ai_loose_rows_num += 1
-            if(self.board[4][4] == 1 and self.board[0][0] == -1):
+            if(self.board[4][4] == 1 and self.current_turn == -1):
                 human_loose_rows_num += 1
 
         heuristic += 10*(ai_loose_rows_num - human_loose_rows_num)*self.current_turn
@@ -253,5 +253,5 @@ othello.board = [
     [1 ,-1 , 0 ,  0 ,  0 ,  1],
     [1 , 1 , 1 ,  1 ,  1 , -1]
 ]
-othello.current_turn=1
+othello.current_turn=-1
 print (othello.get_heuristic())
