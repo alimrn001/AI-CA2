@@ -1,15 +1,17 @@
 import random 
 import copy
 import time
+import pandas as pd
+
 
 CrossoverProbability = 0.7
 MutationProbability = 0.3
-CarryProbability = 0.3
-PopulationSize = 200
+CarryProbability = 0.4
+PopulationSize = 1000
 MaxRandomVal = 200
-GoalMinReturn = 2.5
-GoalMaxRisk = 0.4
-GoalMinStocks = 3
+GoalMinReturn = 10
+GoalMaxRisk = 0.6
+GoalMinStocks = 30
 
 
 class Stock : #each element of a gene
@@ -84,19 +86,26 @@ class Investment : # acts as a chromosome
 
 
 stockData = []
-Aapl = Stock("AAPL", 0.2586, 0.9482)
-Googl = Stock("GOOGL", 0.4285, 0.466)
-Amzn = Stock("AMZN", 0.5779, 0.1)
-Tsla = Stock("TSLA", 0.7, 5.12)
-Msft = Stock("MSFT", 0.3, 0.56)
-Nvda = Stock("NVDA", 0.62, 2.27)
+# Aapl = Stock("AAPL", 0.2586, 0.9482)
+# Googl = Stock("GOOGL", 0.4285, 0.466)
+# Amzn = Stock("AMZN", 0.5779, 0.1)
+# Tsla = Stock("TSLA", 0.7, 5.12)
+# Msft = Stock("MSFT", 0.3, 0.56)
+# Nvda = Stock("NVDA", 0.62, 2.27)
 
-stockData.append(Aapl)
-stockData.append(Googl)
-stockData.append(Amzn)
-stockData.append(Tsla)
-stockData.append(Msft)
-stockData.append(Nvda)
+# stockData.append(Aapl)
+# stockData.append(Googl)
+# stockData.append(Amzn)
+# stockData.append(Tsla)
+# stockData.append(Msft)
+# stockData.append(Nvda)
+
+
+def getCsvData(fileName) : 
+    df = pd.read_csv('sample.csv')
+    for index, row in df.iterrows() :
+        stock = Stock(row['ticker'], float(row['risk']), float(row['return']))
+        stockData.append(stock)
 
 def getInitialPopulation() :
     population = []
@@ -212,6 +221,7 @@ def applyGenetic(population) :
 
 
 stime = time.time()
+getCsvData('sample.csv')
 
 population = getInitialPopulation()
 result = applyGenetic(population)
