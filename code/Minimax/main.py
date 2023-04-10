@@ -219,7 +219,6 @@ class Othello:
     
         if(depth==0) :
             returnedVal = (self.get_heuristic(), None)
-            #print(returnedVal, ' : is returned')
             return returnedVal
         
         final_move_human, final_move_cpu = None, None
@@ -258,6 +257,53 @@ class Othello:
                     min_res, final_move_cpu = min_temp, move
             return min_res, final_move_cpu
     
+    def pruning_minimax(self, depth, max_val, min_val) : #alpha -> max_val , beta -> min_val
+        if(depth==0) :
+            returnedVal = (self.get_heuristic(), None)
+            return returnedVal
+        
+        final_move_human, final_move_cpu = None, None
+
+        if(self.current_turn == 1) :
+            max_res = -sys.maxsize
+            for move in self.get_valid_moves(1) :
+                new_board = copy.deepcopy(self.board)
+                new_turn = copy.deepcopy(self.current_turn)
+                new_state = Othello(False, depth)
+                new_state.board = new_board
+                new_state.current_turn = new_turn
+                new_state.make_move(self.current_turn,move)
+                new_state.current_turn = -self.current_turn
+                
+                max_temp = new_state.pruning_minimax(depth-1, max_val, min_val)[0]
+                if(max_temp >= max_res) :
+                    max_res, final_move_human = max_temp, move
+                if(max_res >= min_val) :
+                    break
+                max_val = max(max_val, max_res)
+
+            return max_res, final_move_human
+
+        else :
+            min_res = sys.maxsize
+            for move in self.get_valid_moves(-1) :
+                new_board = copy.deepcopy(self.board)
+                new_turn = copy.deepcopy(self.current_turn)
+                new_state = Othello(False, depth)
+                new_state.board = new_board
+                new_state.current_turn = new_turn
+                new_state.make_move(self.current_turn, move)
+                new_state.current_turn = -self.current_turn
+
+                min_temp = new_state.pruning_minimax(depth-1, max_val, min_val)[0]
+                if(min_temp <= min_res) : 
+                    min_res, final_move_cpu = min_temp, move
+                if(min_res <= max_val) :
+                    break
+
+                min_val = min(min_val, min_res)
+            return min_res, final_move_cpu
+
     def get_cpu_move(self):
         moves = self.get_valid_moves(-1)
         if len(moves) == 0:
@@ -269,7 +315,10 @@ class Othello:
 
     def get_human_move(self):
         # TODO
-        move = self.minimax(self.minimax_depth)
+        if(self.prune) :
+            move = self.pruning_minimax(self.minimax_depth, max_val=-sys.maxsize, min_val=sys.maxsize)
+        else :    
+            move = self.minimax(self.minimax_depth)
         #print('human move : ', move[0], move[1])
         return move
         # if len(moves) == 0:
@@ -303,18 +352,18 @@ class Othello:
 
 
 
-othello = Othello(True, 5)
-winner = othello.play()
-print('winned by : ',winner)
-
-
-# numOfHumanWins = 0
-# for i in range(30) :
-#     othello = Othello(False, 5)
-#     winner = othello.play()
-#     if(winner==1) :
-#         numOfHumanWins += 1
-
-# print('human win ratio : ', numOfHumanWins/30)
-
+# othello = Othello(True, 7, prune=True)
+# winner = othello.play()
 # print('winned by : ',winner)
+
+
+numOfHumanWins = 0
+for i in range(100) :
+    othello = Othello(False, 5, True) #alpha-betta pruning
+    winner = othello.play()
+    if(winner==1) :
+        numOfHumanWins += 1
+
+print('human win ratio : ', numOfHumanWins/10)
+
+print('winned by : ',winner)
