@@ -227,7 +227,13 @@ class Othello:
         if(self.current_turn == 1) :
             max_res = -sys.maxsize
             for move in self.get_valid_moves(1) :
-                new_state = copy.deepcopy(self)
+                new_board = copy.deepcopy(self.board)
+                new_turn = copy.deepcopy(self.current_turn)
+                #new_depth = copy.deepcopy(self.minimax_depth)
+                new_state = Othello(False, depth)
+                new_state.board = new_board
+                new_state.current_turn = new_turn
+                #new_state = copy.deepcopy(self)
                 new_state.make_move(self.current_turn,move)
                 new_state.current_turn = -self.current_turn
                 max_temp = new_state.minimax(depth-1)[0]
@@ -238,12 +244,17 @@ class Othello:
         else :
             min_res = sys.maxsize
             for move in self.get_valid_moves(-1) :
-                new_state = copy.deepcopy(self)
+                new_board = copy.deepcopy(self.board)
+                new_turn = copy.deepcopy(self.current_turn)
+                #new_depth = copy.deepcopy(self.minimax_depth)
+                new_state = Othello(False, depth)
+                new_state.board = new_board
+                new_state.current_turn = new_turn
+                #new_state = copy.deepcopy(self)
                 new_state.make_move(self.current_turn, move)
                 new_state.current_turn = -self.current_turn
                 min_temp = new_state.minimax(depth-1)[0]
                 if(min_temp <= min_res) : 
-                    #print('min temp is : ', min_temp)
                     min_res, final_move_cpu = min_temp, move
             return min_res, final_move_cpu
     
@@ -252,14 +263,14 @@ class Othello:
         if len(moves) == 0:
             return None
         move = random.choice(moves)
-        print('AI move : ', move)
+        #print('AI move : ', move)
         return move
         #return random.choice(moves)
 
     def get_human_move(self):
         # TODO
         move = self.minimax(self.minimax_depth)
-        print('human move : ', move[0], move[1])
+        #print('human move : ', move[0], move[1])
         return move
         # if len(moves) == 0:
         #     return None
@@ -292,7 +303,7 @@ class Othello:
 
 
 
-othello = Othello(False, 5)
+othello = Othello(True, 5)
 winner = othello.play()
 print('winned by : ',winner)
 
