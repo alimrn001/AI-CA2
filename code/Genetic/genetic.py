@@ -113,25 +113,6 @@ def getInitialPopulation() :
         
     return population
 
-def getReturnInInvestment(investment) :
-    returnVal = 0
-    for stock in investment :
-        returnVal += stock.coefficient * stock.returnVal
-    return returnVal
-
-def getRiskInInvestment(investment) :
-    riskVal = 0
-    for stock in investment :
-        riskVal += stock.coefficient * stock.riskVal
-    return riskVal
-
-def getNumOfStocksInInvestment(investment) :
-    numOfStocks = 0
-    for stock in investment :
-        if(stock.coefficient != 0) :
-            numOfStocks += 1
-    return numOfStocks
-
 def calculateFitness(population) :
     for chromosome in population :
         chromosome.setFitness() 
@@ -139,7 +120,7 @@ def calculateFitness(population) :
 def applyCrossover(matingPool) : #mating pool is chromosome population
     crossoverPool, parents = [], []
     
-    for i in range(len(matingPool)-1) : #last item never gets inside crossover !!
+    for i in range(len(matingPool)-1) : 
         if(random.random() > CrossoverProbability) :
             crossoverPool.append(matingPool[i])
         else :
@@ -166,7 +147,7 @@ def applyMutation(chromosome) :
     for i, gene in enumerate(mutated.stocks) :
         r = random.random()
         if(r < MutationProbability) :
-            mutated.stocks[i].coefficient = random.randint(0, MaxRandomVal) # 0 to 1
+            mutated.stocks[i].coefficient = random.randint(0, MaxRandomVal) # 0 to 200
             changed = True
 
     if(changed) :
