@@ -45,24 +45,27 @@ class Investment : # acts as a chromosome
             st.coefficient *= 100
 
     def setFitness(self) :
-        returnGoal, riskGoal, stockGoal = 0,0,0
+        # returnGoal, riskGoal, stockGoal = 0,0,0
 
-        if(self.stocksNum > GoalMinStocks) :
-            stockGoal = 0
-        else :
-            stockGoal = abs(self.stocksNum - GoalMinStocks)
+        # if(self.stocksNum > GoalMinStocks) :
+        #     stockGoal = 0
+        # else :
+        #     stockGoal = abs(self.stocksNum - GoalMinStocks)
 
-        if(self.returnVal > GoalMinReturn) :
-            returnGoal = 0
-        else :
-            returnGoal = abs(self.returnVal - GoalMinReturn)
+        # if(self.returnVal > GoalMinReturn) :
+        #     returnGoal = 0
+        # else :
+        #     returnGoal = abs(self.returnVal - GoalMinReturn)
 
-        if(self.riskVal < GoalMaxRisk) :
-            riskGoal = 0
-        else :
-            riskGoal = abs(self.riskVal - GoalMaxRisk)
+        # if(self.riskVal < GoalMaxRisk) :
+        #     riskGoal = 0
+        # else :
+        #     riskGoal = abs(self.riskVal - GoalMaxRisk)
            
-        fitness = 1 / (stockGoal + returnGoal + riskGoal + 1)
+        # fitness = 1 / (stockGoal + returnGoal + riskGoal + 1)
+
+        fitness = self.returnVal / self.riskVal
+
         self.fitness = fitness
     
     def setStocksNumber(self) :
@@ -84,22 +87,7 @@ class Investment : # acts as a chromosome
             riskVal += stock.coefficient/100 * stock.riskVal
         self.riskVal = riskVal
 
-
 stockData = []
-# Aapl = Stock("AAPL", 0.2586, 0.9482)
-# Googl = Stock("GOOGL", 0.4285, 0.466)
-# Amzn = Stock("AMZN", 0.5779, 0.1)
-# Tsla = Stock("TSLA", 0.7, 5.12)
-# Msft = Stock("MSFT", 0.3, 0.56)
-# Nvda = Stock("NVDA", 0.62, 2.27)
-
-# stockData.append(Aapl)
-# stockData.append(Googl)
-# stockData.append(Amzn)
-# stockData.append(Tsla)
-# stockData.append(Msft)
-# stockData.append(Nvda)
-
 
 def getCsvData(fileName) : 
     df = pd.read_csv('sample.csv')
@@ -119,7 +107,7 @@ def getInitialPopulation() :
             stockData[k].setCoefficient(r[k])
 
         stockDataCp = copy.deepcopy(stockData)
-        investment = Investment(stockDataCp)
+        investment  = Investment(stockDataCp)
 
         population.append(investment)
         
@@ -190,20 +178,13 @@ def applyMutation(chromosome) :
 
 def applyGenetic(population) : 
     
-    cnt=0
-    
     while(True) :
-        cnt += 1
-
         random.shuffle(population)
         calculateFitness(population)
 
         for invest in population :
-            if(invest.fitness == 1) :
+            if(invest.fitness >= GoalMinReturn/GoalMaxRisk and invest.returnVal >= GoalMinReturn and invest.riskVal <= GoalMaxRisk and invest.stocksNum >= GoalMinStocks) :    
                 return invest
-
-        if(cnt == 1000) :
-            break
 
         carriedChromosomes, selectedChromosomes = [], copy.deepcopy(population)
         selectedChromosomes.sort(reverse=True, key=lambda x : x.fitness)
