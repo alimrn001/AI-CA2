@@ -126,11 +126,10 @@ class Othello:
                     human_tiles += 1
 
         if(human_tiles + ai_tiles == 36) :
-            # print('reaching here at end !')
             if(human_tiles > ai_tiles) :
-                return sys.maxsize * (self.current_turn)
+                return sys.maxsize * (1)
             elif(human_tiles < ai_tiles) :
-                return -sys.maxsize * (self.current_turn)
+                return -sys.maxsize * (1)
             else :
                 return 0 # match draw case
 
@@ -143,75 +142,12 @@ class Othello:
                 elif(self.board[i][j] == -1) :
                     ai_corners += 1
 
-        heuristic += 5*(human_corners - ai_corners) * 1
+        heuristic += 5*(human_corners - ai_corners) * 1 #coeff can be more than 5 too !
         
-        # num_of_human_possible_moves = len(self.get_valid_moves())
+        num_of_human_possible_moves = len(self.get_valid_moves(1))
+        num_of_ai_possible_moves = len(self.get_valid_moves(-1))
 
-        # if(self.board[0][0] == 0) :
-        #     if(self.board[1][0] == -1 and self.current_turn == 1) :
-        #         ai_loose_rows_num += 1
-        #     elif(self.board[1][0] == 1 and self.current_turn == -1) :
-        #         human_loose_rows_num += 1
-            
-        #     if(self.board[0][1] == -1 and self.current_turn == 1):
-        #         ai_loose_rows_num += 1
-        #     elif(self.board[0][1] == 1 and self.current_turn == -1):
-        #         human_loose_rows_num += 1
-
-        #     if(self.board[1][1] == -1 and self.current_turn == 1):
-        #         ai_loose_rows_num += 1
-        #     if(self.board[1][1] == 1 and self.current_turn == -1):
-        #         human_loose_rows_num += 1
-
-        # if(self.board[0][5] == 0) :
-        #     if(self.board[1][5] == -1 and self.current_turn == 1) :
-        #         ai_loose_rows_num += 1
-        #     elif(self.board[1][5] == 1 and self.current_turn == -1) :
-        #         human_loose_rows_num += 1
-            
-        #     if(self.board[0][4] == -1 and self.current_turn == 1):
-        #         ai_loose_rows_num += 1
-        #     elif(self.board[0][4] == 1 and self.current_turn == -1):
-        #         human_loose_rows_num += 1
-
-        #     if(self.board[1][4] == -1 and self.current_turn == 1):
-        #         ai_loose_rows_num += 1
-        #     if(self.board[1][4] == 1 and self.current_turn == -1):
-        #         human_loose_rows_num += 1
-
-        # if(self.board[5][0] == 0) :
-        #     if(self.board[4][0] == -1 and self.current_turn == 1) :
-        #         ai_loose_rows_num += 1
-        #     elif(self.board[4][0] == 1 and self.current_turn == -1) :
-        #         human_loose_rows_num += 1
-            
-        #     if(self.board[5][1] == -1 and self.current_turn == 1):
-        #         ai_loose_rows_num += 1
-        #     elif(self.board[5][1] == 1 and self.current_turn == -1):
-        #         human_loose_rows_num += 1
-
-        #     if(self.board[4][1] == -1 and self.current_turn == 1):
-        #         ai_loose_rows_num += 1
-        #     if(self.board[4][1] == 1 and self.current_turn == -1):
-        #         human_loose_rows_num += 1
-            
-        # if(self.board[5][5] == 0) :
-        #     if(self.board[5][4] == -1 and self.current_turn == 1) :
-        #         ai_loose_rows_num += 1
-        #     elif(self.board[5][4] == 1 and self.current_turn == -1) :
-        #         human_loose_rows_num += 1
-            
-        #     if(self.board[4][5] == -1 and self.current_turn == 1):
-        #         ai_loose_rows_num += 1
-        #     elif(self.board[4][5] == 1 and self.current_turn == -1):
-        #         human_loose_rows_num += 1
-
-        #     if(self.board[4][4] == -1 and self.current_turn == 1):
-        #         ai_loose_rows_num += 1
-        #     if(self.board[4][4] == 1 and self.current_turn == -1):
-        #         human_loose_rows_num += 1
-
-        # heuristic += 10*(ai_loose_rows_num - human_loose_rows_num)*self.current_turn
+        heuristic += 3*(num_of_human_possible_moves - num_of_ai_possible_moves)
 
         return heuristic
         
@@ -228,11 +164,11 @@ class Othello:
             for move in self.get_valid_moves(1) :
                 new_board = copy.deepcopy(self.board)
                 new_turn = copy.deepcopy(self.current_turn)
-                #new_depth = copy.deepcopy(self.minimax_depth)
+                
                 new_state = Othello(False, depth)
                 new_state.board = new_board
                 new_state.current_turn = new_turn
-                #new_state = copy.deepcopy(self)
+                
                 new_state.make_move(self.current_turn,move)
                 new_state.current_turn = -self.current_turn
                 max_temp = new_state.minimax(depth-1)[0]
@@ -245,11 +181,11 @@ class Othello:
             for move in self.get_valid_moves(-1) :
                 new_board = copy.deepcopy(self.board)
                 new_turn = copy.deepcopy(self.current_turn)
-                #new_depth = copy.deepcopy(self.minimax_depth)
+                
                 new_state = Othello(False, depth)
                 new_state.board = new_board
                 new_state.current_turn = new_turn
-                #new_state = copy.deepcopy(self)
+                
                 new_state.make_move(self.current_turn, move)
                 new_state.current_turn = -self.current_turn
                 min_temp = new_state.minimax(depth-1)[0]
@@ -308,10 +244,8 @@ class Othello:
         moves = self.get_valid_moves(-1)
         if len(moves) == 0:
             return None
-        move = random.choice(moves)
-        #print('AI move : ', move)
+        move = random.choice(moves)        
         return move
-        #return random.choice(moves)
 
     def get_human_move(self):
         # TODO
@@ -319,13 +253,8 @@ class Othello:
             move = self.pruning_minimax(self.minimax_depth, max_val=-sys.maxsize, min_val=sys.maxsize)
         else :    
             move = self.minimax(self.minimax_depth)
-        #print('human move : ', move[0], move[1])
+            
         return move
-        # if len(moves) == 0:
-        #     return None
-        # return random.choice(moves)
-
-        # raise NotImplementedError
 
     def terminal_test(self):
         return len(self.get_valid_moves(1)) == 0 and len(self.get_valid_moves(-1)) == 0
@@ -351,19 +280,111 @@ class Othello:
         return winner
 
 
-
-# othello = Othello(True, 7, prune=True)
-# winner = othello.play()
-# print('winned by : ',winner)
-
-
-numOfHumanWins = 0
-for i in range(100) :
-    othello = Othello(False, 5, True) #alpha-betta pruning
-    winner = othello.play()
-    if(winner==1) :
-        numOfHumanWins += 1
-
-print('human win ratio : ', numOfHumanWins/10)
-
+####### playing game #######
+othello = Othello(True, 5, prune=True)
+winner = othello.play()
 print('winned by : ',winner)
+
+###### depth = 1 without pruning ######
+
+# stime = time.time()
+# numOfHumanWins = 0
+# for i in range(200) :
+#     othello = Othello(False, 1, False)
+#     winner = othello.play()
+#     if(winner==1) :
+#         numOfHumanWins += 1
+# print('minimax simulation without pruning and with depth = 1 and total 200 executions')
+# print('human win ratio : ', (numOfHumanWins/200)*100, '%')
+# print("time taken :\n--- %s seconds ---" % (time.time() - stime))
+# print('\n-----------------------------------\n')
+
+
+###### depth = 3 without pruning ######
+
+# stime = time.time()
+# numOfHumanWins = 0
+# for i in range(100) :
+#     othello = Othello(False, 3, False) 
+#     winner = othello.play()
+#     if(winner==1) :
+#         numOfHumanWins += 1
+# print('minimax simulation without pruning and with depth = 3 and total 100 executions')
+# print('human win ratio : ', (numOfHumanWins/100)*100, '%')
+# print("time taken :\n--- %s seconds ---" % (time.time() - stime))
+# print('\n-----------------------------------\n')
+
+###### depth = 5 without pruning ######
+
+# stime = time.time()
+# numOfHumanWins = 0
+# for i in range(10) :
+#     othello = Othello(False, 5, False) 
+#     winner = othello.play()
+#     if(winner==1) :
+#         numOfHumanWins += 1
+# print('minimax simulation without pruning and with depth = 5 and total 10 executions')
+# print('human win ratio : ', (numOfHumanWins/10)*100, '%')
+# print("time taken :\n--- %s seconds ---" % (time.time() - stime))
+# print('\n-----------------------------------\n')
+
+
+
+###### depth = 1 with pruning ######
+
+# stime = time.time()
+# numOfHumanWins = 0
+# for i in range(200) :
+#     othello = Othello(False, 1, True) #alpha-betta pruning
+#     winner = othello.play()
+#     if(winner==1) :
+#         numOfHumanWins += 1
+# print('minimax simulation with pruning and with depth = 1 and total 200 executions')
+# print('human win ratio : ', (numOfHumanWins/200)*100, '%')
+# print("time taken :\n--- %s seconds ---" % (time.time() - stime))
+# print('\n-----------------------------------\n')
+
+
+###### depth = 3 with pruning ######
+
+# stime = time.time()
+# numOfHumanWins = 0
+# for i in range(100) :
+#     othello = Othello(False, 3, True) 
+#     winner = othello.play()
+#     if(winner==1) :
+#         numOfHumanWins += 1
+# print('minimax simulation without pruning and with depth = 3 and total 100 executions')
+# print('human win ratio : ', (numOfHumanWins/100)*100, '%')
+# print("time taken :\n--- %s seconds ---" % (time.time() - stime))
+# print('\n-----------------------------------\n')
+
+
+###### depth = 5 with pruning ######
+
+# stime = time.time()
+# numOfHumanWins = 0
+# for i in range(10) :
+#     othello = Othello(False, 5, True) #alpha-betta pruning
+#     winner = othello.play()
+#     if(winner==1) :
+#         numOfHumanWins += 1
+# print('minimax simulation with pruning and with depth = 5 and total 10 executions')
+# print('human win ratio : ', (numOfHumanWins/10)*100, '%')
+# print("time taken :\n--- %s seconds ---" % (time.time() - stime))
+# print('\n-----------------------------------\n')
+
+###### depth = 7 with pruning ######
+
+# stime = time.time()
+# numOfHumanWins = 0
+# for i in range(10) :
+#     othello = Othello(False, 7, True) #alpha-betta pruning
+#     winner = othello.play()
+#     if(winner==1) :
+#         numOfHumanWins += 1
+# print('minimax simulation with pruning and with depth = 7 and total 10 executions')
+# print('human win ratio : ', (numOfHumanWins/10)*100, '%')
+# print("time taken :\n--- %s seconds ---" % (time.time() - stime))
+# print('\n-----------------------------------\n')
+
